@@ -1,0 +1,36 @@
+services:
+  llm_service:
+    build:
+      context: .
+      dockerfile: services/llm_service/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+      - ./src:/app/src:ro
+      - ./services/llm_service/server.py:/app/server.py:ro
+    environment:
+      - MODELS_DIR=/app/models
+      - DEFAULT_MODEL=gemma-4-E2B-it
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  ui_service:
+    build:
+      context: .
+      dockerfile: services/ui_service/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./services/ui_service/app.py:/app/app.py:ro
+    environment:
+      - LLM_SERVICE_URL=http://llm_service:8000
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      llm_service:
+        condition: service_healthy
