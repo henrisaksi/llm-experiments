@@ -206,8 +206,15 @@ async def generate_stream(req: GenerateRequest):
     thread = threading.Thread(target=model.generate, kwargs=gen_kwargs)
     thread.start()
 
-    async def token_generator() -> AsyncGenerator[str, None]:
+    def token_generator():
         for token_chunk in streamer:
             yield token_chunk
 
-    return StreamingResponse(token_generator(), media_type="text/plain")
+    return StreamingResponse(
+        token_generator(),
+        media_type="text/plain",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+        },
+    )
