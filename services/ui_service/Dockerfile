@@ -10,6 +10,8 @@ COPY services/ui_service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY services/ui_service/app.py .
+COPY services/ui_service/.chainlit ./.chainlit
+COPY services/ui_service/public ./public
 
 EXPOSE 8080
 

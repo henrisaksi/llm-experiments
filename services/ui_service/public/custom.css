@@ -1,0 +1,4 @@
+/* Hide the Chainlit LLM disclaimer / watermark footer */
+.watermark {
+  display: none !important;
+}
